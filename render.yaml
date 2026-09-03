@@ -69,7 +69,7 @@ services:
       # first-party everywhere.
       - type: rewrite
         source: /api/*
-        destination: https://lhh-api.onrender.com/api/:splat
+        destination: https://lhh-api.onrender.com/api/*
       # BrowserRouter needs this — without it, refreshing on e.g. /menu/cakes
       # 404s instead of loading the SPA and letting React Router take over.
       - type: rewrite
