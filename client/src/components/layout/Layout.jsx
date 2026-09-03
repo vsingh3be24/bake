@@ -5,6 +5,7 @@ import { FlashBar } from './FlashBar.jsx';
 import { Navbar } from './Navbar.jsx';
 import { Footer } from './Footer.jsx';
 import { MobileNav } from './MobileNav.jsx';
+import { PushOptIn } from './PushOptIn.jsx';
 import { useLenis } from '../../hooks/useLenis.js';
 import { useReducedMotion } from '../../hooks/useReducedMotion.js';
 
@@ -33,6 +34,7 @@ export function Layout() {
       </main>
       <Footer />
       <MobileNav />
+      <PushOptIn />
     </div>
   );
 }

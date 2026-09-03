@@ -7,3 +7,4 @@ export { default as Settings } from './Settings.js';
 export { default as Notification } from './Notification.js';
 export { default as StockAlert } from './StockAlert.js';
 export { default as Admin } from './Admin.js';
+export { default as PushSubscription } from './PushSubscription.js';

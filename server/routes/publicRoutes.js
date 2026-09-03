@@ -18,7 +18,8 @@ import { createStockAlert } from '../controllers/public/stockAlertController.js'
 import { validateCart } from '../controllers/public/cartController.js';
 import { createOrder, trackOrder } from '../controllers/public/orderController.js';
 import { uploadPaymentScreenshot } from '../controllers/public/uploadController.js';
-import { orderLimiter, stockAlertLimiter, uploadLimiter, trackLimiter } from '../middleware/rateLimit.js';
+import { getVapidPublicKey, subscribe, unsubscribe } from '../controllers/public/pushController.js';
+import { orderLimiter, stockAlertLimiter, uploadLimiter, trackLimiter, pushSubscribeLimiter } from '../middleware/rateLimit.js';
 import { attachCustomerIfPresent } from '../middleware/customerAuth.js';
 
 const router = Router();
@@ -55,5 +56,9 @@ router.post(
   upload.single('file'),
   asyncHandler(uploadPaymentScreenshot)
 );
+
+router.get('/push/vapid-public-key', asyncHandler(getVapidPublicKey));
+router.post('/push/subscribe', pushSubscribeLimiter, asyncHandler(attachCustomerIfPresent), asyncHandler(subscribe));
+router.post('/push/unsubscribe', pushSubscribeLimiter, asyncHandler(unsubscribe));
 
 export default router;

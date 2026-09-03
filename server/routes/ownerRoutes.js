@@ -2,7 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { requireOwner } from '../middleware/ownerAuth.js';
-import { loginLimiter, orderLimiter, uploadLimiter } from '../middleware/rateLimit.js';
+import { loginLimiter, orderLimiter, uploadLimiter, pushBroadcastLimiter } from '../middleware/rateLimit.js';
 import * as auth from '../controllers/owner/authController.js';
 import * as dashboard from '../controllers/owner/dashboardController.js';
 import * as orders from '../controllers/owner/orderController.js';
@@ -13,6 +13,7 @@ import * as customers from '../controllers/owner/customerController.js';
 import * as settings from '../controllers/owner/settingsController.js';
 import * as notifications from '../controllers/owner/notificationController.js';
 import * as analytics from '../controllers/owner/analyticsController.js';
+import * as push from '../controllers/owner/pushController.js';
 
 const router = Router();
 const protect = asyncHandler(requireOwner);
@@ -85,5 +86,8 @@ router.patch('/notifications/:id/read', protect, asyncHandler(notifications.mark
 
 // Analytics (Part D.10).
 router.get('/analytics', protect, asyncHandler(analytics.getOwnerAnalytics));
+
+router.get('/push/subscribers', protect, asyncHandler(push.getSubscriberCount));
+router.post('/push/broadcast', protect, pushBroadcastLimiter, asyncHandler(push.broadcast));
 
 export default router;

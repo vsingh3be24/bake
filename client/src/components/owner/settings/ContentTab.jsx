@@ -2,6 +2,7 @@ import { useSettingsDraft } from '../../../hooks/useSettingsDraft.js';
 import { Input } from '../../ui/Input.jsx';
 import { Switch } from '../../ui/Switch.jsx';
 import { Button } from '../../ui/Button.jsx';
+import { PushBroadcast } from './PushBroadcast.jsx';
 
 const FIELDS = ['announcementBar', 'announcementActive', 'whatsappNumber', 'instagramUrl', 'aboutText'];
 
@@ -52,6 +53,8 @@ export function ContentTab({ settings, onSave, saving }) {
       <Button className="w-fit" loading={saving} disabled={!dirty} onClick={() => onSave(draft)}>
         Save Changes
       </Button>
+
+      <PushBroadcast />
     </div>
   );
 }

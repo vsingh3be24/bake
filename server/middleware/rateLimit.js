@@ -60,3 +60,21 @@ export const signupLimiter = rateLimit({
   legacyHeaders: false,
   message: { message: 'Too many attempts — please try again in 15 minutes' },
 });
+
+export const pushSubscribeLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests — please try again in a minute' },
+});
+
+// A broadcast fans out to every subscribed customer's device in one call —
+// tight on purpose so a fumbled double-click can't spam everyone twice.
+export const pushBroadcastLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Please wait a few minutes before sending another broadcast' },
+});

@@ -1,4 +1,4 @@
-import { Cake, Cookie, Leaf, Croissant, Gift, UtensilsCrossed } from 'lucide-react';
+import { Cake, Cookie, Leaf, Croissant, Gift, EggOff, UtensilsCrossed } from 'lucide-react';
 
 export const CATEGORY_ICONS = {
   cake: Cake,
@@ -6,6 +6,7 @@ export const CATEGORY_ICONS = {
   leaf: Leaf,
   croissant: Croissant,
   gift: Gift,
+  'egg-off': EggOff,
 };
 
 export function getCategoryIcon(icon) {

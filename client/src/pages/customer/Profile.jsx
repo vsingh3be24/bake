@@ -5,6 +5,7 @@ import { api } from '../../lib/api.js';
 import { Card } from '../../components/ui/Card.jsx';
 import { Input } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
+import { PushToggle } from '../../components/customer/PushToggle.jsx';
 
 export function Profile() {
   const customer = useAuthStore((s) => s.customer);
@@ -65,6 +66,8 @@ export function Profile() {
           </Button>
         </form>
       </Card>
+
+      <PushToggle />
 
       <Card className="flex flex-col gap-4 p-5">
         <h2 className="font-heading text-xl text-brown">Change Password</h2>
