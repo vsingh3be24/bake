@@ -349,6 +349,7 @@ export async function placeOrder(payload, authCustomerId = null, opts = {}) {
     paymentMethod: payload.paymentMethod,
     paymentStatus: 'pending',
     upiRefNumber: payload.upiRefNumber?.trim() || '',
+    payerName: payload.payerName?.trim().slice(0, 60) || '',
     // Screenshot is uploaded via its own endpoint first; this order only ever
     // stores the resulting Cloudinary URL, never a raw file.
     paymentScreenshot: /^https:\/\//.test(payload.paymentScreenshot || '') ? payload.paymentScreenshot : '',

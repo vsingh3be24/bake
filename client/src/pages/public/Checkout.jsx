@@ -74,6 +74,7 @@ export function Checkout() {
   const [isGift, setIsGift] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('UPI');
   const [utr, setUtr] = useState('');
+  const [payerName, setPayerName] = useState('');
   const [screenshotUrl, setScreenshotUrl] = useState(null);
   const [placing, setPlacing] = useState(false);
 
@@ -144,6 +145,7 @@ export function Checkout() {
         deliveryType,
         paymentMethod,
         upiRefNumber: utr.trim() || undefined,
+        payerName: payerName.trim() || undefined,
         paymentScreenshot: screenshotUrl || undefined,
         offerCode: offerCode || undefined,
         specialNote,
@@ -261,6 +263,8 @@ export function Checkout() {
               utr={utr}
               onUtrChange={setUtr}
               utrError={errors.utr}
+              payerName={payerName}
+              onPayerNameChange={setPayerName}
               settings={settings}
               amount={grandTotal}
               screenshotUrl={screenshotUrl}
@@ -293,6 +297,7 @@ export function Checkout() {
                 <p className="text-sm text-brown-mute">Payment</p>
                 <p className="text-brown">
                   {paymentMethod}
+                  {payerName ? ` • Paid as ${payerName}` : ''}
                   {utr ? ` • UTR ${utr}` : ''}
                   {screenshotUrl ? ' • Screenshot attached' : ''}
                 </p>

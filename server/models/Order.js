@@ -83,6 +83,10 @@ const orderSchema = new mongoose.Schema(
       default: 'pending',
     },
     upiRefNumber: { type: String, default: '' },
+    // Either this or upiRefNumber is enough to identify a payment on the
+    // owner's own UPI app statement — most customers only remember one or
+    // the other, so both are optional and neither is required alone.
+    payerName: { type: String, default: '' },
     paymentScreenshot: { type: String, default: '' },
     paidAt: { type: Date, default: null },
     verifiedBy: { type: String, default: '' },

@@ -35,7 +35,7 @@ export function CapacityTab({ settings, onSave, saving }) {
           min={0}
           value={draft.minPrepHours}
           onChange={(e) => setField('minPrepHours')(e.target.value)}
-          helperText="Fallback for items without their own prep time"
+          helperText="Fallback for items without their own prep time (24 = 1 day ahead)"
         />
         <Input
           label="Max Advance Days"

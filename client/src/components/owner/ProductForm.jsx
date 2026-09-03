@@ -243,7 +243,14 @@ export function ProductForm({ initial, onSubmit, onCancel, submitting }) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Input label="Min Qty" type="number" min={1} value={data.minQty} onChange={onInput('minQty')} />
           <Input label="Max Qty" type="number" min={1} value={data.maxQty} onChange={onInput('maxQty')} />
-          <Input label="Prep Time (hrs)" type="number" min={0} value={data.prepTimeHours} onChange={onInput('prepTimeHours')} />
+          <Input
+            label="Prep Time (hrs)"
+            type="number"
+            min={0}
+            value={data.prepTimeHours}
+            onChange={onInput('prepTimeHours')}
+            helperText="24 = order 1 day ahead, 48 = order 2 days ahead"
+          />
         </div>
       </div>
 

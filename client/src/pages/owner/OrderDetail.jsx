@@ -257,6 +257,7 @@ export function OwnerOrderDetail() {
         <p className="text-sm text-brown-soft">
           {order.paymentMethod} • <span className="capitalize">{order.paymentStatus}</span>
         </p>
+        {order.payerName && <p className="text-sm text-brown-soft">Paid as: {order.payerName}</p>}
         {order.upiRefNumber && <p className="text-sm text-brown-soft">UTR: {order.upiRefNumber}</p>}
         {order.paymentScreenshot && (
           <img src={order.paymentScreenshot} alt="Payment screenshot" className="mt-1 max-w-[200px] rounded-md border border-[rgba(169,141,116,0.25)]" />

@@ -8,6 +8,8 @@ export function PaymentSelect({
   utr,
   onUtrChange,
   utrError,
+  payerName,
+  onPayerNameChange,
   settings,
   amount,
   screenshotUrl,
@@ -64,16 +66,28 @@ export function PaymentSelect({
       {value === 'UPI' && (
         <div className="flex flex-col gap-4 rounded-md bg-cream-deep p-4">
           <UpiQr settings={settings} amount={amount} screenshotUrl={screenshotUrl} onScreenshotChange={onScreenshotChange} />
-          <Input
-            label="UTR / Reference Number"
-            inputMode="numeric"
-            maxLength={12}
-            value={utr}
-            onChange={(e) => onUtrChange(e.target.value)}
-            error={utrError}
-            helperText="Enter the 12-digit reference number after paying (optional for now)"
-            placeholder="123456789012"
-          />
+          <p className="text-sm text-brown-soft">
+            Help us match your payment — fill in <strong>either</strong> of these, whichever's easier:
+          </p>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input
+              label="Name on the Payment"
+              value={payerName}
+              onChange={(e) => onPayerNameChange(e.target.value)}
+              helperText="The name shown in your UPI app"
+              placeholder="e.g. your GPay name"
+            />
+            <Input
+              label="UTR / Reference Number"
+              inputMode="numeric"
+              maxLength={12}
+              value={utr}
+              onChange={(e) => onUtrChange(e.target.value)}
+              error={utrError}
+              helperText="The 12-digit reference number"
+              placeholder="123456789012"
+            />
+          </div>
         </div>
       )}
 
