@@ -1,0 +1,39 @@
+@import './theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--cream);
+    color: var(--brown-soft);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    color: var(--brown);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+.container-lhh {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+@media (min-width: 768px) {
+  .container-lhh {
+    padding-inline: 40px;
+  }
+}

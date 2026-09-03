@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: lhh-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false
+      - key: CUSTOMER_JWT_SECRET
+        generateValue: true
+      - key: OWNER_JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRY
+        value: 7d
+      - key: OWNER_PHONE
+        sync: false
+      - key: OWNER_PASSWORD_HASH
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: SHOP_TIMEZONE
+        value: Asia/Kolkata

@@ -1,0 +1,43 @@
+:root {
+  /* Base */
+  --cream: #FDF6E9; /* page background */
+  --cream-deep: #F5E9D3; /* card background */
+  --paper: #FFFDF7; /* elevated surface */
+
+  /* Brand */
+  --brown: #4A2C1A; /* headings, logo */
+  --brown-soft: #7A5230; /* body text */
+  --brown-mute: #A98D74; /* muted / placeholder */
+  --maroon: #8C1D2F; /* primary CTA */
+  --maroon-dark: #6E1524; /* CTA hover */
+  --crimson: #C2185B; /* sale / flash accent */
+  --olive: #5C6B33; /* healthy tag, success-ish */
+  --gold: #C9A227; /* dividers, ornaments */
+
+  /* Status */
+  --in-stock: #2E7D32;
+  --low-stock: #E58E26;
+  --out-stock: #C62828;
+  --info: #1565C0;
+
+  /* Shadows */
+  --sh-sm: 0 2px 8px rgba(74, 44, 26, .06);
+  --sh-md: 0 8px 24px rgba(74, 44, 26, .10);
+  --sh-lg: 0 20px 48px rgba(74, 44, 26, .16);
+
+  /* Radii */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-pill: 999px;
+
+  /* Fonts */
+  --font-display: "Playfair Display", serif;
+  --font-heading: "Cormorant Garamond", serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Layout — fixed height of MobileNav.jsx's bottom bar (sm:hidden). Any
+     other fixed-position mobile element that stacks above it (e.g. the
+     ProductDetail add-to-cart bar) reads this instead of guessing the pixel value. */
+  --mobile-nav-h: 64px;
+}
