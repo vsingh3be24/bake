@@ -46,8 +46,14 @@ as a static site). It intentionally leaves every secret-shaped value unset
 4. Once live, hit `https://<lhh-api>.onrender.com/api/health` — it should
    return `{"ok":true}`. That confirms the app booted and connected to
    Atlas (the process would have exited otherwise).
-5. Now fill in `lhh-client`'s variables using the real API URL from step 4:
-   - `VITE_API_URL` = `https://<lhh-api>.onrender.com/api`
+5. Now fill in `lhh-client`'s variables:
+   - `VITE_API_URL` = `/api` — a relative path, not the full `lhh-api` URL.
+     `render.yaml` proxies `/api/*` on `lhh-client` through to `lhh-api`
+     server-side, so the browser only ever talks to `lhh-client`'s own
+     origin. This is what makes the auth cookie first-party instead of
+     cross-site — without it, iOS Safari and Chrome-on-iOS (WebKit-based)
+     block the cookie outright via Intelligent Tracking Prevention, and
+     login silently fails to persist on iPhone.
    - `VITE_WHATSAPP` = `918017853043` (or the real order-WhatsApp number)
 
    These are build-time only (Vite bakes them into the bundle) — changing
@@ -150,7 +156,7 @@ local dev pair from `server/.env` in production.
 | `SHOP_TIMEZONE` | `lhh-api` | `Asia/Kolkata` |
 | `NODE_ENV` | `lhh-api` | `production` (see § 3 — this is what flips the cookie policy) |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | `lhh-api` | optional — see § 5 |
-| `VITE_API_URL` | `lhh-client` | `https://<lhh-api>.onrender.com/api` — build-time only |
+| `VITE_API_URL` | `lhh-client` | `/api` (relative — proxied to `lhh-api` server-side, see § 2 step 5) — build-time only |
 | `VITE_WHATSAPP` | `lhh-client` | order WhatsApp number, no `+` or spaces — build-time only |
 
 Full reference with inline explanations: `server/.env.example`,

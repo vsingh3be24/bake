@@ -58,6 +58,18 @@ services:
       - key: VITE_WHATSAPP
         sync: false
     routes:
+      # Proxy API calls through this same origin instead of the browser
+      # talking to lhh-api directly. Without this, the auth cookie is
+      # third-party from the browser's point of view (lhh-client and
+      # lhh-api are different hosts, SameSite=None or not) — iOS Safari
+      # and Chrome-on-iOS (which uses WebKit under Apple's rules) block
+      # that outright via Intelligent Tracking Prevention, so owner/
+      # customer login silently fails to persist on iPhone. Proxying
+      # keeps every request on lhh-client's own origin, so the cookie is
+      # first-party everywhere.
+      - type: rewrite
+        source: /api/*
+        destination: https://lhh-api.onrender.com/api/:splat
       # BrowserRouter needs this — without it, refreshing on e.g. /menu/cakes
       # 404s instead of loading the SPA and letting React Router take over.
       - type: rewrite
