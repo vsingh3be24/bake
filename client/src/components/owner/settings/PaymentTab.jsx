@@ -45,7 +45,13 @@ export function PaymentTab({ settings, onSave, saving }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Input label="UPI ID" value={draft.upiId} onChange={(e) => setField('upiId')(e.target.value)} placeholder="lucky@upi" />
+        <Input
+          label="UPI ID"
+          value={draft.upiId}
+          onChange={(e) => setField('upiId')(e.target.value)}
+          placeholder="lucky@upi"
+          helperText="Optional — without it, customers just see your QR code and phone number"
+        />
         <Input label="Payee Name" value={draft.payeeName} onChange={(e) => setField('payeeName')(e.target.value)} />
       </div>
 

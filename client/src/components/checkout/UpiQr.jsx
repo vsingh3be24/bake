@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Copy, Check, Smartphone, ImagePlus, X } from 'lucide-react';
 import { api } from '../../lib/api.js';
 import { buildUpiLink } from '../../lib/upi.js';
+import { ownerPhoneDisplay } from '../../lib/whatsapp.js';
 import { useToast } from '../../hooks/useToast.js';
 import { Button } from '../ui/Button.jsx';
 
@@ -21,10 +22,11 @@ export function UpiQr({ settings, amount, screenshotUrl, onScreenshotChange }) {
   const payLink = upiId
     ? buildUpiLink({ upiId, payeeName: settings?.payeeName || "Lucky's Home Harvest", amount })
     : null;
+  const phone = ownerPhoneDisplay();
 
-  const copyUpiId = async () => {
+  const copyValue = async (value) => {
     try {
-      await navigator.clipboard.writeText(upiId);
+      await navigator.clipboard.writeText(value);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -60,10 +62,6 @@ export function UpiQr({ settings, amount, screenshotUrl, onScreenshotChange }) {
     }
   };
 
-  if (!upiId) {
-    return <p className="text-sm text-brown-mute">UPI details are not set up yet — please try Cash on Delivery.</p>;
-  }
-
   return (
     <div className="flex flex-col items-center gap-4 text-center">
       {settings?.upiQrImage ? (
@@ -78,14 +76,30 @@ export function UpiQr({ settings, amount, screenshotUrl, onScreenshotChange }) {
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={copyUpiId}
-        className="inline-flex items-center gap-2 rounded-pill border border-[rgba(169,141,116,0.35)] px-4 py-2 text-sm font-medium text-brown transition-colors hover:border-maroon"
-      >
-        {upiId}
-        {copied ? <Check size={15} strokeWidth={2} className="text-in-stock" /> : <Copy size={15} strokeWidth={1.75} />}
-      </button>
+      {upiId ? (
+        <button
+          type="button"
+          onClick={() => copyValue(upiId)}
+          className="inline-flex items-center gap-2 rounded-pill border border-[rgba(169,141,116,0.35)] px-4 py-2 text-sm font-medium text-brown transition-colors hover:border-maroon"
+        >
+          {upiId}
+          {copied ? <Check size={15} strokeWidth={2} className="text-in-stock" /> : <Copy size={15} strokeWidth={1.75} />}
+        </button>
+      ) : (
+        phone && (
+          <div className="flex flex-col items-center gap-1.5">
+            <p className="text-sm text-brown-soft">Pay via GPay / PhonePe / Paytm to</p>
+            <button
+              type="button"
+              onClick={() => copyValue(phone.replace(/\s/g, ''))}
+              className="inline-flex items-center gap-2 rounded-pill border border-[rgba(169,141,116,0.35)] px-4 py-2 text-sm font-medium text-brown transition-colors hover:border-maroon"
+            >
+              {phone}
+              {copied ? <Check size={15} strokeWidth={2} className="text-in-stock" /> : <Copy size={15} strokeWidth={1.75} />}
+            </button>
+          </div>
+        )
+      )}
 
       {isMobile() && payLink && (
         <Button as="a" href={payLink} fullWidth>
