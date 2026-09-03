@@ -53,6 +53,14 @@ unset (`sync: false`) so nothing sensitive lives in git.
    bcrypt-hash your own password locally and set `OWNER_PASSWORD_HASH`
    before seeding, or as a Render env var before first boot.)
 
+   **Re-running this later is safe.** Once the shop has products, the seed
+   switches to safe mode: it adds any catalog category that's missing (so a
+   later release adding one lands with a re-run) and leaves your products,
+   stock levels and offers completely alone. It only wipes and reinstalls
+   the demo catalog on an empty database, or if you explicitly pass
+   `--force` — which you should not do once real orders exist, since it
+   leaves them pointing at deleted products.
+
 Render's free tier spins down after inactivity — the first request after a
 quiet period takes ~30-50s while it wakes up. That's expected, not a bug.
 
@@ -105,6 +113,24 @@ just against localhost:
       (still true in prod — this was verified against a local backend in
       the Phase 23 security pass, worth a spot-check against the real one)
 
+## 6. Push notifications (optional)
+
+The owner's "Send Notification" panel (Settings → Content) needs a VAPID key
+pair. Without one it shows a plain "not set up yet" message and everything
+else keeps working, so you can skip this and come back to it.
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+Put the pair in Render as `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`, plus
+`VAPID_SUBJECT` (a `mailto:` address push services can reach you at).
+
+**Generate this once and keep it.** The public key is baked into every
+customer's stored subscription — rotating the pair silently invalidates all
+of them, and every customer would have to opt in again. Don't reuse the
+local dev pair from `server/.env` in production.
+
 ## Environment variable reference
 
 | Var | Where | Notes |
@@ -118,6 +144,7 @@ just against localhost:
 | `CLIENT_URL` | Render | exact Vercel origin, no trailing slash |
 | `SHOP_TIMEZONE` | Render | `Asia/Kolkata` |
 | `NODE_ENV` | Render | `production` (see § 4 — this is what flips the cookie policy) |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Render | optional — see § 6 |
 | `VITE_API_URL` | Vercel | `https://<render-service>.onrender.com/api` |
 | `VITE_WHATSAPP` | Vercel | order WhatsApp number, no `+` or spaces |
 

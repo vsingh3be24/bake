@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import Category from '../models/Category.js';
 import Product from '../models/Product.js';
 import Offer from '../models/Offer.js';
+import Order from '../models/Order.js';
 import Admin from '../models/Admin.js';
 import { getSettings } from '../services/settingsService.js';
 import { categories } from './data/categories.js';
@@ -36,23 +37,75 @@ async function seedAdmin() {
   console.log(`Admin account ready — phone: ${phone}`);
 }
 
-async function run() {
-  await mongoose.connect(process.env.MONGO_URI);
-  console.log('Connected to MongoDB for seeding');
+/**
+ * Adds any catalog category that isn't there yet, matched on slug, and
+ * leaves existing ones untouched (their name/icon/order may have been
+ * edited since). Safe to run against a live shop.
+ */
+async function upsertCategories() {
+  let added = 0;
+  for (const category of categories) {
+    const res = await Category.updateOne(
+      { slug: category.slug },
+      { $setOnInsert: category },
+      { upsert: true }
+    );
+    if (res.upsertedCount) added += 1;
+  }
+  const idBySlug = Object.fromEntries(
+    (await Category.find().select('slug')).map((c) => [c.slug, c._id])
+  );
+  return { added, idBySlug };
+}
 
+/** Wipe-and-replace the demo catalog. Only ever runs on an empty shop or
+ * behind an explicit --force, because it destroys real stock levels,
+ * hand-added products and live offers. */
+async function freshSeed() {
   await Promise.all([Category.deleteMany({}), Product.deleteMany({}), Offer.deleteMany({})]);
 
   const insertedCategories = await Category.insertMany(categories);
   const categoryIdBySlug = Object.fromEntries(insertedCategories.map((c) => [c.slug, c._id]));
   console.log(`Seeded ${insertedCategories.length} categories`);
 
-  const products = buildProducts(categoryIdBySlug);
-  const insertedProducts = await Product.insertMany(products);
+  const insertedProducts = await Product.insertMany(buildProducts(categoryIdBySlug));
   console.log(`Seeded ${insertedProducts.length} products`);
 
-  const offers = buildOffers(categoryIdBySlug);
-  const insertedOffers = await Offer.insertMany(offers);
+  const insertedOffers = await Offer.insertMany(buildOffers(categoryIdBySlug));
   console.log(`Seeded ${insertedOffers.length} offers`);
+}
+
+async function run() {
+  const force = process.argv.includes('--force') || process.env.SEED_FORCE === 'true';
+
+  await mongoose.connect(process.env.MONGO_URI);
+  console.log('Connected to MongoDB for seeding');
+
+  const [productCount, orderCount] = await Promise.all([
+    Product.countDocuments(),
+    Order.countDocuments(),
+  ]);
+  const shopHasData = productCount > 0;
+
+  if (shopHasData && !force) {
+    // This is somebody's real shop. Top up what's missing; touch nothing else.
+    const { added } = await upsertCategories();
+    console.log(
+      `\nThis database already has ${productCount} product(s)${orderCount ? ` and ${orderCount} order(s)` : ''} — ` +
+        'running in safe mode.'
+    );
+    console.log(`  Categories: ${added} added, existing ones left alone`);
+    console.log('  Products and offers: untouched (your stock levels and edits are safe)');
+    console.log('  Re-run with --force to wipe the catalog and reinstall the demo data.\n');
+  } else {
+    if (force && shopHasData) {
+      console.log(
+        `\n⚠️  --force: deleting ${productCount} product(s) and all categories/offers.` +
+          (orderCount ? ` ${orderCount} existing order(s) will be left with dangling product references.` : '')
+      );
+    }
+    await freshSeed();
+  }
 
   await getSettings();
   console.log('Settings ready (default doc created if none existed)');

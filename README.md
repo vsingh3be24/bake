@@ -9,15 +9,18 @@ Fresh • Hygienic • Homemade · +91 80178 53043
 
 ## Screenshots
 
-*(add real captures to [`screenshots/`](./screenshots) — see that folder's
-README for exactly which screens and how; embedded below so they appear
-automatically once added)*
+Captured from the running app against a seeded database — real orders, real
+stock states, real charts.
 
-| | |
+| Customer | |
 |---|---|
 | ![Home](./screenshots/home.png) | ![Menu](./screenshots/menu.png) |
 | ![Product detail](./screenshots/product-detail.png) | ![Checkout](./screenshots/checkout.png) |
+
+| Owner | |
+|---|---|
 | ![Owner dashboard](./screenshots/owner-dashboard.png) | ![Kitchen queue](./screenshots/owner-queue.png) |
+| ![Baking list](./screenshots/owner-baking-list.png) | ![Products](./screenshots/owner-products.png) |
 | ![Analytics](./screenshots/owner-analytics.png) | ![Mobile menu](./screenshots/mobile-menu.png) |
 
 ## What it does
