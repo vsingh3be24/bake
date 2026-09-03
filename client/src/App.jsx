@@ -28,6 +28,7 @@ import { OwnerLogin } from './pages/owner/Login.jsx';
 import { OwnerDashboard } from './pages/owner/Dashboard.jsx';
 import { OwnerOrders } from './pages/owner/Orders.jsx';
 import { OwnerOrderDetail } from './pages/owner/OrderDetail.jsx';
+import { OwnerProducts } from './pages/owner/Products.jsx';
 import { OwnerStock } from './pages/owner/Stock.jsx';
 import { OwnerOffers } from './pages/owner/Offers.jsx';
 import { OwnerQueue } from './pages/owner/Queue.jsx';
@@ -103,7 +104,7 @@ function App() {
         <Route index element={<OwnerDashboard />} />
         <Route path="orders" element={<OwnerOrders />} />
         <Route path="orders/:id" element={<OwnerOrderDetail />} />
-        <Route path="products" element={<ComingSoon title="Products" />} />
+        <Route path="products" element={<OwnerProducts />} />
         <Route path="stock" element={<OwnerStock />} />
         <Route path="offers" element={<OwnerOffers />} />
         <Route path="queue" element={<OwnerQueue />} />

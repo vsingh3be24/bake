@@ -1,6 +1,8 @@
 import Product from '../../models/Product.js';
+import Category from '../../models/Category.js';
 import { AppError } from '../../utils/AppError.js';
 import { escapeRegex } from '../../utils/regex.js';
+import { assertValidImage, uploadImageBuffer } from '../../utils/cloudinary.js';
 
 const STOCK_MODES = ['unlimited', 'counted', 'daily_capacity'];
 
@@ -172,4 +174,155 @@ export async function toggleHotSelling(req, res) {
     .select(STOCK_FIELDS)
     .populate('category', 'name slug');
   res.json(product);
+}
+
+// --- Full product CRUD (create/edit/archive) ---------------------------
+
+function slugify(name) {
+  return String(name)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/** Appends -2, -3, ... until the slug is free (excluding the doc being edited). */
+async function uniqueSlug(base, excludeId = null) {
+  let slug = base || 'item';
+  let n = 2;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const query = { slug };
+    if (excludeId) query._id = { $ne: excludeId };
+    // eslint-disable-next-line no-await-in-loop
+    const clash = await Product.findOne(query).select('_id');
+    if (!clash) return slug;
+    slug = `${base}-${n++}`;
+  }
+}
+
+/** Every field an owner can set from the Products screen. Everything else
+ * (soldCount, viewCount, hotSellingLocked, timestamps, _id) is server-owned —
+ * hotSellingLocked in particular is set only by the dedicated toggle endpoint,
+ * so a product-edit save can never silently override that decision. */
+const EDITABLE_FIELDS = [
+  'name', 'category', 'shortDesc', 'longDesc', 'images',
+  'variants', 'hasVariants', 'price', 'salePrice', 'unit',
+  'stockMode', 'stockCount', 'dailyCapacity', 'lowStockThreshold',
+  'inStock', 'autoOutOfStock', 'restockDate',
+  'minQty', 'maxQty', 'stepQty',
+  'prepTimeHours', 'isRushAvailable', 'rushCharge', 'availableDays',
+  'isHotSelling', 'isNew', 'isChefSpecial',
+  'tags', 'allergens', 'nutritionNote', 'isVisible', 'sortOrder',
+];
+
+function normalizeBody(body) {
+  const data = {};
+  for (const field of EDITABLE_FIELDS) {
+    if (body[field] !== undefined) data[field] = body[field];
+  }
+  return data;
+}
+
+async function assertValidCategory(categoryId) {
+  if (!categoryId) throw new AppError('Please choose a category');
+  const category = await Category.findById(categoryId).select('_id');
+  if (!category) throw new AppError('That category does not exist');
+}
+
+/** Full product list for the Products screen — every field, including
+ * archived (isActive:false) items so the owner can restore one. */
+export async function listProducts(req, res) {
+  const { search, category, includeArchived } = req.query;
+  const query = includeArchived === 'true' ? {} : { isActive: true };
+
+  if (search?.trim()) query.name = new RegExp(escapeRegex(search.trim()), 'i');
+  if (category) query.category = category;
+
+  const products = await Product.find(query)
+    .populate('category', 'name slug')
+    .sort({ sortOrder: 1, name: 1 });
+  res.json(products);
+}
+
+export async function getProduct(req, res) {
+  const product = await Product.findById(req.params.id).populate('category', 'name slug');
+  if (!product) throw new AppError('Product not found', 404);
+  res.json(product);
+}
+
+export async function createProduct(req, res) {
+  const data = normalizeBody(req.body);
+  if (!data.name?.trim()) throw new AppError('Please give the product a name');
+  await assertValidCategory(data.category);
+  if (!data.hasVariants && (data.price == null || data.price === '')) {
+    throw new AppError('Please set a price (or add variants)');
+  }
+
+  data.slug = await uniqueSlug(slugify(data.name));
+
+  try {
+    const product = await Product.create(data);
+    const populated = await product.populate('category', 'name slug');
+    res.status(201).json(populated);
+  } catch (err) {
+    if (err.code === 11000) throw new AppError('A product with that name already exists');
+    throw err;
+  }
+}
+
+export async function updateProduct(req, res) {
+  const data = normalizeBody(req.body);
+  if (data.category) await assertValidCategory(data.category);
+
+  const existing = await Product.findById(req.params.id).select('name slug');
+  if (!existing) throw new AppError('Product not found', 404);
+
+  // Renaming re-slugs (so the customer-facing URL stays readable), but only
+  // when the name actually changed — never disturb an unrelated edit's URL.
+  if (data.name && data.name.trim() !== existing.name) {
+    data.slug = await uniqueSlug(slugify(data.name), existing._id);
+  }
+
+  try {
+    const product = await Product.findByIdAndUpdate(req.params.id, { $set: data }, {
+      new: true,
+      runValidators: true,
+    }).populate('category', 'name slug');
+    res.json(product);
+  } catch (err) {
+    if (err.code === 11000) throw new AppError('A product with that name already exists');
+    throw err;
+  }
+}
+
+/** Soft delete — orders already placed still reference this product by id, so
+ * a hard delete would leave those with a dangling reference. isActive:false
+ * drops it from every customer- and owner-facing list (Menu, Stock, Offers'
+ * product picker) while keeping order history intact. */
+export async function archiveProduct(req, res) {
+  const product = await Product.findByIdAndUpdate(
+    req.params.id,
+    { $set: { isActive: false, isVisible: false } },
+    { new: true }
+  );
+  if (!product) throw new AppError('Product not found', 404);
+  res.status(204).end();
+}
+
+export async function restoreProduct(req, res) {
+  const product = await Product.findByIdAndUpdate(
+    req.params.id,
+    { $set: { isActive: true } },
+    { new: true }
+  ).populate('category', 'name slug');
+  if (!product) throw new AppError('Product not found', 404);
+  res.json(product);
+}
+
+export async function uploadProductImage(req, res) {
+  if (!req.file) throw new AppError('An image file is required');
+  assertValidImage(req.file);
+  const url = await uploadImageBuffer(req.file.buffer, 'luckys-home-harvest/products');
+  res.status(201).json({ url });
 }

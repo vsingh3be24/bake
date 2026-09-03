@@ -38,6 +38,7 @@ const NAV = [
 const LIVE_ROUTES = new Set([
   '/owner',
   '/owner/orders',
+  '/owner/products',
   '/owner/stock',
   '/owner/offers',
   '/owner/queue',

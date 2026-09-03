@@ -49,6 +49,16 @@ router.patch('/products/bulk-stock', protect, asyncHandler(products.bulkStock));
 router.patch('/products/:id/stock', protect, asyncHandler(products.updateStock));
 router.patch('/products/:id/hot-selling', protect, asyncHandler(products.toggleHotSelling));
 
+// Products screen — full create/edit/archive, plus its own image upload
+// (separate Cloudinary folder from settings' uploadImage).
+router.get('/products', protect, asyncHandler(products.listProducts));
+router.post('/products', protect, asyncHandler(products.createProduct));
+router.post('/products/upload-image', protect, uploadLimiter, upload.single('file'), asyncHandler(products.uploadProductImage));
+router.get('/products/:id', protect, asyncHandler(products.getProduct));
+router.patch('/products/:id', protect, asyncHandler(products.updateProduct));
+router.patch('/products/:id/restore', protect, asyncHandler(products.restoreProduct));
+router.delete('/products/:id', protect, asyncHandler(products.archiveProduct));
+
 // Offers (Part D.7). Static/collection routes before the :id ones.
 router.get('/offers', protect, asyncHandler(offers.listOffers));
 router.post('/offers', protect, asyncHandler(offers.createOffer));
