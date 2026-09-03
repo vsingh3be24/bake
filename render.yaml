@@ -34,3 +34,32 @@ services:
         sync: false
       - key: SHOP_TIMEZONE
         value: Asia/Kolkata
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        sync: false
+
+  # Client — a static site on Render instead of Vercel. VITE_* vars are
+  # baked in at build time, so unlike the API's env vars these can't be
+  # changed after deploy without a rebuild.
+  - type: web
+    name: lhh-client
+    runtime: static
+    rootDir: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      # Fill in once lhh-api has a live URL (chicken-and-egg with CLIENT_URL
+      # below — deploy the API first, then come back and set both).
+      - key: VITE_API_URL
+        sync: false
+      - key: VITE_WHATSAPP
+        sync: false
+    routes:
+      # BrowserRouter needs this — without it, refreshing on e.g. /menu/cakes
+      # 404s instead of loading the SPA and letting React Router take over.
+      - type: rewrite
+        source: /*
+        destination: /index.html
