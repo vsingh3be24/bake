@@ -37,7 +37,7 @@ function HeroTitle() {
   const text = "Lucky's Home Harvest";
 
   if (reduce) {
-    return <h1 className="font-display text-4xl italic text-brown sm:text-6xl">{text}</h1>;
+    return <h1 className="font-display whitespace-nowrap text-3xl italic text-brown sm:text-6xl">{text}</h1>;
   }
 
   return (
@@ -45,7 +45,7 @@ function HeroTitle() {
       variants={heroContainer}
       initial="hidden"
       animate="show"
-      className="font-display text-4xl italic text-brown sm:text-6xl"
+      className="font-display whitespace-nowrap text-3xl italic text-brown sm:text-6xl"
     >
       {text.split('').map((c, i) => (
         <motion.span key={i} variants={heroLetter} className="inline-block">
