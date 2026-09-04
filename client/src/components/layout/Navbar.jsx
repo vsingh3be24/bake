@@ -26,16 +26,18 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-[rgba(169,141,116,0.2)] bg-[rgba(253,246,233,0.95)] backdrop-blur-sm">
       <div className="container-lhh flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5">
+        <Link to="/" className="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
           {logoOk && (
             <img
               src="/logo.png"
               alt=""
               onError={() => setLogoOk(false)}
-              className="h-10 w-10 shrink-0 rounded-full object-cover"
+              className="h-8 w-8 shrink-0 rounded-full object-cover sm:h-10 sm:w-10"
             />
           )}
-          <span className="font-display text-2xl italic text-brown">Lucky&rsquo;s Home Harvest</span>
+          <span className="whitespace-nowrap font-display text-base italic text-brown sm:text-2xl">
+            Lucky&rsquo;s Home Harvest
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-6 sm:flex">
